@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  drogon-app:
+    build: .
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    container_name: drogon_logical_clock
+    

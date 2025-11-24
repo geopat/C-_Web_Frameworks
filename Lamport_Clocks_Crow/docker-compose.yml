@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  crow-app:
+    build: .
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    container_name: crow_logical_clock

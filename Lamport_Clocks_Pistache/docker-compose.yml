@@ -1,0 +1,7 @@
+services:
+  pistache-app:
+    build: .
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    container_name: pistache_logical_clock

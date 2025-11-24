@@ -1,0 +1,134 @@
+# Crow C++ Application with Lamport Logical Clock
+
+A simple C++ web application using the Crow framework that implements a Lamport logical clock for tracking causality in distributed systems.
+
+## What is a Logical Clock?
+
+Lamport logical clocks track causality between events in distributed systems, not physical time. Each event increments the clock, and when receiving messages, the clock updates to maintain the "happens-before" relationship.
+
+## Features
+
+- **Lamport Clock Implementation**: Tracks causality of events
+- **REST API**: Simple endpoints to interact with the clock
+- **Thread-safe**: Uses atomic operations and mutexes
+- **Docker Ready**: Easy deployment with Docker
+
+## Prerequisites
+
+- Docker
+- Docker Compose (optional)
+
+## Project Structure
+
+```
+.
+├── main.cpp
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+```
+
+## Building and Running
+
+### Option 1: Using Docker Compose (Recommended)
+
+```bash
+docker-compose up --build
+```
+
+### Option 2: Using Docker directly
+
+```bash
+# Build the image
+docker build -t crow-logical-clock .
+
+# Run the container
+docker run -p 8080:8080 crow-logical-clock
+```
+
+## API Endpoints
+
+### GET `/`
+Health check endpoint.
+
+**Response:**
+```
+Crow server with Lamport Clock is running!
+```
+
+### GET `/time`
+Triggers a local event and returns the current logical time.
+
+**Response:**
+```json
+{
+  "logical_time": 1,
+  "message": "Local event occurred"
+}
+```
+
+### POST `/receive`
+Simulates receiving a message from another node with a timestamp.
+
+**Request Body:**
+```json
+{
+  "timestamp": 5
+}
+```
+
+**Response:**
+```json
+{
+  "received_timestamp": 5,
+  "updated_logical_time": 6,
+  "message": "Clock synchronized with received event"
+}
+```
+
+### GET `/send`
+Gets current timestamp to send to another node.
+
+**Response:**
+```json
+{
+  "logical_time": 2,
+  "message": "Use this timestamp when sending to another node"
+}
+```
+
+## Testing the Application
+
+```bash
+# Check if server is running
+curl http://localhost:8080/
+
+# Get current logical time
+curl http://localhost:8080/time
+
+# Send a message (simulate receiving from another node)
+curl -X POST http://localhost:8080/receive \
+  -H "Content-Type: application/json" \
+  -d '{"timestamp": 10}'
+
+# Prepare to send a message
+curl http://localhost:8080/send
+```
+
+## How Lamport Clocks Work
+
+1. **Local Event**: When a process performs an action, it increments its clock
+2. **Send Event**: When sending a message, include the current clock value
+3. **Receive Event**: When receiving a message, update clock to `max(local_clock, received_clock) + 1`
+
+This ensures that if event A causally precedes event B, then the timestamp of A is less than the timestamp of B.
+
+## Stopping the Application
+
+```bash
+# If using docker-compose
+docker-compose down
+
+# If using docker run
+docker stop <container_id>
+```
